@@ -1,5 +1,6 @@
 package zad1;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -11,11 +12,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class Futil {
 
-    //plik do zapisu
-    public static Path path = Paths.get("TPO1res.txt");
+    public static File file;
 
     public static void processDir(String dirName, String resultFileName) {
+
         try {
+            file = new File(resultFileName);
+            file.delete();
+            file.createNewFile();
+
             Files.walkFileTree(Paths.get(dirName), new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -32,13 +37,15 @@ public class Futil {
 
         RandomAccessFile file = new RandomAccessFile(path, "r");
         FileChannel channel = file.getChannel();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(512);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(48);
         Charset charset = Charset.forName("Cp1250");
 
         while(channel.read(byteBuffer) > 0){
-            byteBuffer.rewind();
-            writeToFile(byteBuffer);
             byteBuffer.flip();
+            while(byteBuffer.hasRemaining()){
+                writeToFile(byteBuffer);
+            }
+            byteBuffer.clear();
         }
 
         channel.close();
@@ -48,8 +55,7 @@ public class Futil {
 
 
     public static void writeToFile(ByteBuffer byteBuffer) throws IOException {
-
-        FileChannel channel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         channel.write(byteBuffer);
         channel.close();
 
