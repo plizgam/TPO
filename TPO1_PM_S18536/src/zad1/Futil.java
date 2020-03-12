@@ -1,30 +1,34 @@
 package zad1;
 
-import java.io.File;
+
+
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 
+
 public class Futil {
 
-    public static File file;
+
+
+     static FileChannel outputChannel;
 
     public static void processDir(String dirName, String resultFileName) {
 
         try {
-            file = new File(resultFileName);
-            file.delete();
-            file.createNewFile();
+            FileChannel.open(Paths.get(resultFileName), StandardOpenOption.WRITE).truncate(0).close();
+
+            outputChannel = FileChannel.open(Paths.get(resultFileName), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 
             Files.walkFileTree(Paths.get(dirName), new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    readFile(file.toString());
+                    readFile(file, attrs.size());
                     return super.visitFile(file, attrs);
                 }
             });
@@ -33,31 +37,26 @@ public class Futil {
         }
     }
 
-    public static void readFile(String path) throws IOException {
+    public static void readFile(Path path, long size) throws IOException {
 
-        RandomAccessFile file = new RandomAccessFile(path, "r");
-        FileChannel channel = file.getChannel();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(48);
-        Charset charset = Charset.forName("Cp1250");
+        FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
+        ByteBuffer byteBuffer = ByteBuffer.allocate((int)size +1);
 
-        while(channel.read(byteBuffer) > 0){
-            byteBuffer.flip();
-            while(byteBuffer.hasRemaining()){
-                writeToFile(byteBuffer);
-            }
-            byteBuffer.clear();
-        }
+        channel.read(byteBuffer);
+        byteBuffer.flip();
 
-        channel.close();
-        file.close();
+        Charset charsetIn = Charset.forName("Cp1250");
+        Charset charsetOut = Charset.forName("UTF-8");
 
-    }
+        CharBuffer charBuffer = charsetIn.decode(byteBuffer);
+        ByteBuffer bufferAdds = charsetOut.encode(charBuffer);
+
+        while(bufferAdds.hasRemaining()){
+            outputChannel.write(bufferAdds);
+       }
 
 
-    public static void writeToFile(ByteBuffer byteBuffer) throws IOException {
-        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        channel.write(byteBuffer);
-        channel.close();
+       channel.close();
 
     }
 }
