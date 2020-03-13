@@ -21,9 +21,10 @@ public class Futil {
     public static void processDir(String dirName, String resultFileName) {
 
         try {
-            FileChannel.open(Paths.get(resultFileName), StandardOpenOption.WRITE).truncate(0).close();
 
             outputChannel = FileChannel.open(Paths.get(resultFileName), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
+            FileChannel.open(Paths.get(resultFileName), StandardOpenOption.WRITE).truncate(0).close();
 
             Files.walkFileTree(Paths.get(dirName), new SimpleFileVisitor<Path>() {
                 @Override
