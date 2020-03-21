@@ -14,7 +14,7 @@ public class Main {
     Double rate1 = s.getRateFor("USD");
     Double rate2 = s.getNBPRate();
 
-    WindowApp gui = new WindowApp(s);
+    new WindowApp(s);
 
   }
 }
