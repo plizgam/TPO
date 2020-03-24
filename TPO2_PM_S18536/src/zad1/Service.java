@@ -22,28 +22,15 @@ import org.json.JSONObject;
 
 public class Service {
 
-    String country, city, currency;
+    String country, city, currency, isoCountry, currencyForCountry;
     double temperature, nbp, rate, pressure;
 
 
 
     public Service(String country){
         this.country = country;
-    }
-
-    String getWeather(String city){
-        this.city = city;
-
-        String result = getResponse("https://openweathermap.org/data/2.5/weather?q=" + city + "," + country + "&appid=b6907d289e10d714a6e88b30761fae22");
-        temperature = new JSONObject(result).getJSONObject("main").getDouble("temp");
-        pressure = new JSONObject(result).getJSONObject("main").getDouble("pressure");
-
-        return result;
-    }
-
-    Double getRateFor(String currency){
-        this.currency = currency;
-        String isoCountry = "";
+        
+        isoCountry = "";
         Locale english = Locale.ENGLISH;
 
 
@@ -54,9 +41,26 @@ public class Service {
                 break;
             }
         }
+        
+        this.currencyForCountry = Currency.getInstance(new Locale("", isoCountry)).getCurrencyCode();
+    }
 
+    String getWeather(String city){
+        this.city = city;
+        
+       
+        
+        String result = getResponse("https://openweathermap.org/data/2.5/weather?q=" + city + ","+ isoCountry +"&appid=b6907d289e10d714a6e88b30761fae22");
+        temperature = new JSONObject(result).getJSONObject("main").getDouble("temp");
+        pressure = new JSONObject(result).getJSONObject("main").getDouble("pressure");
 
-        String response = getResponse("https://api.exchangeratesapi.io/latest?base=" + Currency.getInstance(new Locale("", isoCountry)).getCurrencyCode());
+        return result;
+    }
+
+    Double getRateFor(String currency){
+        this.currency = currency;
+     
+        String response = getResponse("https://api.exchangeratesapi.io/latest?base=" + currencyForCountry);
         return rate = new JSONObject(response).getJSONObject("rates").getDouble(currency);
     }
 
@@ -64,13 +68,16 @@ public class Service {
         String response = getResponse("http://www.nbp.pl/kursy/kursya.html");
         response += getResponse("http://www.nbp.pl/kursy/kursyb.html");
 
-
-        Pattern compiledPattern = Pattern.compile(currency+"</td>[^>]+[^(\\\\d+\\\\.\\\\d+)]+</td>");
+        if(!currencyForCountry.equals("PLN")) {
+      
+        Pattern compiledPattern = Pattern.compile(currencyForCountry+"</td>[^>]+[^(\\\\d+\\\\.\\\\d+)]+</td>");
         Matcher matcher = compiledPattern.matcher(response);
         matcher.find();
-
         return nbp = Double.parseDouble(matcher.group().split(">")[2].replace("</td","").replace(",", "."));
-    }
+        } else {
+        	return 0.0;
+        }
+     }
 
     String getResponse(String url){
         try {

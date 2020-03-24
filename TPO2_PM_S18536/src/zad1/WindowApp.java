@@ -36,7 +36,7 @@ public class WindowApp extends JFrame {
         weather.setFont(new Font("Serif", Font.BOLD, 20));
         JLabel rate = new JLabel(" Kurs " + service.currency + ": " + service.rate);
         rate.setFont(new Font("Serif", Font.BOLD, 20));
-        JLabel nbp = new JLabel(" Kurs złotego względem " + service.currency + ": " + service.nbp);
+        JLabel nbp = new JLabel(" Kurs złotego względem " + service.currencyForCountry + ": " + service.nbp);
         nbp.setFont(new Font("Serif", Font.BOLD, 20));
 
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
