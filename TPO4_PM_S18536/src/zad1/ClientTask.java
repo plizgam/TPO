@@ -21,9 +21,8 @@ public class ClientTask implements Runnable {
             @Override
             public void run() {
                 client = c;
-                c.showOutput = showSendRes;
-                c.isClientTask = true;
                 c.connect();
+                c.isMulti = true;
                 c.send("login " + c.id);
 
                 for (String req : reqs) {
@@ -42,9 +41,7 @@ public class ClientTask implements Runnable {
     }
 
     public String get() throws InterruptedException, ExecutionException {
-        if(client.showOutput)
-            return client.sb.toString();
-        else
-            return "";
+            Thread.sleep(1500);
+            return client.sb.toString() + "\n";
     }
 }

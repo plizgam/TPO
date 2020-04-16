@@ -20,7 +20,7 @@ public class Client {
     public StringBuilder sb = new StringBuilder();
     public String host, id;
     public int port;
-    public boolean showOutput, isClientTask = false;
+    public boolean isMulti = false, isComplete = false;
 
     public Client(String host, int port, String id) {
         this.host = host;
@@ -32,7 +32,6 @@ public class Client {
         try {
             sb.append("=== " + id + " log start ===\n" );
             channel = SocketChannel.open();
-            //nieblokujace wyjscie - wejscie
             channel.configureBlocking(false);
             channel.connect(new InetSocketAddress(host, port));
 
@@ -58,7 +57,6 @@ public class Client {
         StringBuffer result = new StringBuffer();
             try {
 
-                //wysyłanie danych
 
                 reqString.setLength(0);
                 if(!req.contains(id))
@@ -73,7 +71,6 @@ public class Client {
                 if(req.contains("-"))
                     sb.append("\nRequest: " + req + "\n");
 
-                //odbiór danych
                 while (true) {
                     inBuf.clear();
                     int readBytes = channel.read(inBuf);
@@ -104,12 +101,13 @@ public class Client {
             }
 
 
-                displayOutput(result.toString());
-
+            displayOutput(result.toString());
             sb.append(result.toString());
 
-            if(req.contains("bye") && (showOutput || !isClientTask)){
+            if(req.contains("bye")){
                 sb.append("\nlogged out \n=== " + id + " log end ===\r");
+                isComplete = true;
+                if(!isMulti)
                 System.out.println(sb.toString());
             }
 
