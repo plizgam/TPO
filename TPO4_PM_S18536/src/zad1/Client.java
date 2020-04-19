@@ -20,7 +20,7 @@ public class Client {
     public StringBuilder sb = new StringBuilder();
     public String host, id;
     public int port;
-    public boolean isMulti = false, isComplete = false;
+    public boolean isMulti = false, showSendRes = false;
 
     public Client(String host, int port, String id) {
         this.host = host;
@@ -106,10 +106,10 @@ public class Client {
 
             if(req.contains("bye")){
                 sb.append("\nlogged out \n=== " + id + " log end ===\r");
-                isComplete = true;
                 if(!isMulti)
                 System.out.println(sb.toString());
             }
+
 
 
         return result.toString();

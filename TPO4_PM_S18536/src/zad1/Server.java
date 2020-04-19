@@ -58,8 +58,6 @@ public class Server {
 
     public void stopServer() throws IOException {
 
-        awaitTerminationAfterShutdown(ex);
-
         ex.shutdown();
         ssc.close();
 
@@ -185,17 +183,4 @@ public class Server {
     public String getServerLog() {
         return serverLog.toString();
     }
-
-    public void awaitTerminationAfterShutdown(ExecutorService threadPool) {
-        threadPool.shutdown();
-        try {
-            if (!threadPool.awaitTermination(3, TimeUnit.SECONDS)) {
-                threadPool.shutdownNow();
-            }
-        } catch (InterruptedException ex) {
-            threadPool.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
-    }
-
 }
