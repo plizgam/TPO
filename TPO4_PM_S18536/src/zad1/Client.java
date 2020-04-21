@@ -75,7 +75,6 @@ public class Client {
                     inBuf.clear();
                     int readBytes = channel.read(inBuf);
                     if (readBytes == 0) {
-                        Thread.sleep(200);
                         continue;
                     }
                     else if (readBytes == -1) {
